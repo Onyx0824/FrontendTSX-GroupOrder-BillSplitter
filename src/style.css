@@ -1,0 +1,1101 @@
+/* ==========================================
+   1. 全局變數與 Figma 磨砂透光玻璃參數
+   ========================================== */
+:root {
+  --bg-color: #83bdca;
+  
+  /* 玻璃主卡片與輸入框透光背景 */
+  --card-glass-bg: rgba(220, 237, 238, 0.28); 
+  --input-glass-bg: rgba(255, 255, 255, 0.18);
+
+  /* -45° 折射高光漸層 */
+  --glass-light-gradient: linear-gradient(
+    135deg, 
+    rgba(255, 255, 255, 0.8) 0%, 
+    rgba(255, 255, 255, 0.15) 35%, 
+    rgba(255, 255, 255, 0.05) 70%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+
+  /* 高光邊框與磨砂模糊 */
+  --glass-border: 1px solid rgba(255, 255, 255, 0.75);
+  --glass-blur: blur(14px);
+
+  /* Figma Drop Shadow + Inset 內陰影 */
+  --figma-drop-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
+  --input-glass-shadow: 
+    inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.9), 
+    inset -1.5px -1.5px 4px rgba(0, 0, 0, 0.08), 
+    2px 2px 4px rgba(0, 0, 0, 0.25);
+
+  --btn-bg: rgba(245, 250, 250, 0.82);
+  --nav-bg: rgba(230, 240, 242, 0.55);
+
+  /* 色彩與圓角規範 */
+  --text-main: #000000;
+  --text-placeholder: #556b6f;
+  --price-green: #387b28;
+  --toggle-bg: rgba(0, 0, 0, 0.08);
+
+  --radius-card: 26px;
+  --radius-input: 22px;
+  --radius-btn: 22px;
+  --radius-item: 20px;
+}
+
+html[data-theme="dark"] {
+  --bg-color: #20282e;
+  --card-glass-bg: rgba(34, 45, 52, 0.82);
+  --input-glass-bg: rgba(18, 27, 33, 0.62);
+  --glass-light-gradient: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02));
+  --glass-border: 1px solid rgba(220, 235, 240, 0.22);
+  --figma-drop-shadow: 2px 2px 6px rgba(0, 0, 0, 0.42);
+  --input-glass-shadow: inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.08), inset -1.5px -1.5px 4px rgba(0, 0, 0, 0.25), 2px 2px 4px rgba(0, 0, 0, 0.3);
+  --btn-bg: rgba(45, 59, 67, 0.92);
+  --nav-bg: rgba(35, 47, 54, 0.9);
+  --text-main: #edf3f3;
+  --text-placeholder: #b1c0c4;
+  --price-green: #a8d98f;
+  --toggle-bg: rgba(255, 255, 255, 0.12);
+}
+
+html[data-theme="dark"] .glass-card {
+  box-shadow: var(--figma-drop-shadow), inset 1px 1px 2px rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme="dark"] .btn-primary {
+  box-shadow: var(--figma-drop-shadow), inset 1px 1px 2px rgba(255, 255, 255, 0.1);
+}
+
+html[data-theme="dark"] .input-control:focus {
+  background-color: rgba(48, 63, 71, 0.95);
+  border-color: rgba(220, 235, 240, 0.55);
+  box-shadow: inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.08), 0 0 12px rgba(255, 255, 255, 0.12), 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* ==========================================
+   2. 基礎重置與統一字型級距設定 (Font Size Scale)
+   ========================================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Georgia", "Segoe UI", serif;
+  -webkit-tap-highlight-color: transparent;
+}
+/*
+body {
+  width: 100vw;
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow-x: hidden;
+}
+*/
+
+/* ==========================================
+   背景 SVG 整合至 CSS body 樣式
+   ========================================== */
+body {
+  width: 100vw;
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow-x: hidden;
+
+  /* 將 SVG 金線背景寫入 CSS (移除 fixed 避免行動裝置與捲軸導致背景消失) */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 1000' preserveAspectRatio='xMidYMid slice'><defs><linearGradient id='goldMetallic' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%23ffffff'/><stop offset='25%' stop-color='%23f7e1a0'/><stop offset='50%' stop-color='%23d4af37'/><stop offset='75%' stop-color='%23aa8328'/><stop offset='100%' stop-color='%23faedc7'/></linearGradient></defs><g stroke='url(%23goldMetallic)' fill='none'><ellipse cx='280' cy='180' rx='460' ry='220' stroke-width='2.2' transform='rotate(-30 280 180)' opacity='0.9'/><ellipse cx='290' cy='190' rx='480' ry='235' stroke-width='1.8' transform='rotate(-32 290 190)' opacity='0.85'/><ellipse cx='260' cy='160' rx='420' ry='190' stroke-width='2.5' transform='rotate(-26 260 160)' opacity='0.95'/><ellipse cx='300' cy='200' rx='500' ry='250' stroke-width='1.2' transform='rotate(-34 300 200)' opacity='0.75'/><ellipse cx='320' cy='100' rx='450' ry='270' stroke-width='2.0' transform='rotate(-18 320 100)' opacity='0.8'/><ellipse cx='300' cy='120' rx='470' ry='250' stroke-width='1.5' transform='rotate(-22 300 120)' opacity='0.75'/><ellipse cx='340' cy='80' rx='430' ry='290' stroke-width='1.0' transform='rotate(-15 340 80)' opacity='0.65'/><ellipse cx='220' cy='220' rx='490' ry='180' stroke-width='1.8' transform='rotate(-42 220 220)' opacity='0.85'/><ellipse cx='240' cy='240' rx='510' ry='200' stroke-width='1.2' transform='rotate(-45 240 240)' opacity='0.7'/></g><g stroke='url(%23goldMetallic)' fill='none'><ellipse cx='720' cy='820' rx='460' ry='220' stroke-width='2.2' transform='rotate(-30 720 820)' opacity='0.9'/><ellipse cx='740' cy='810' rx='480' ry='235' stroke-width='1.8' transform='rotate(-32 740 810)' opacity='0.85'/><ellipse cx='680' cy='840' rx='420' ry='190' stroke-width='2.5' transform='rotate(-26 680 840)' opacity='0.95'/><ellipse cx='680' cy='900' rx='450' ry='270' stroke-width='2.0' transform='rotate(-18 680 900)' opacity='0.8'/><ellipse cx='700' cy='880' rx='470' ry='250' stroke-width='1.5' transform='rotate(-22 700 880)' opacity='0.75'/><ellipse cx='660' cy='920' rx='430' ry='290' stroke-width='1.0' transform='rotate(-15 660 920)' opacity='0.65'/><ellipse cx='780' cy='780' rx='490' ry='180' stroke-width='1.8' transform='rotate(-42 780 780)' opacity='0.85'/><ellipse cx='760' cy='760' rx='510' ry='200' stroke-width='1.2' transform='rotate(-45 760 760)' opacity='0.7'/></g></svg>");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+.app-container {
+  width: 100%;
+  max-width: 414px;
+  height: 100vh;
+  max-height: 896px;
+  padding: 20px 20px 16px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.notch {
+  width: 50px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 2px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+/*
+.bg-gold-lines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 1;
+}
+*/
+
+/* ==========================================
+   3. 頁頭與大標題 (統一標題字級)
+   ========================================== */
+.header-group {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin-top: 6px;
+  margin-bottom: 18px;
+  flex-shrink: 0;
+}
+
+/* 【階層 1】頁面大標題：統一為 32px */
+.page-title {
+  font-size: 32px;
+  font-style: italic;
+  font-weight: 500;
+  color: var(--text-main);
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+/* 主玻璃卡片 */
+.glass-card {
+  width: 100%;
+  flex: 1;
+  background-color: var(--card-glass-bg);
+  background-image: var(--glass-light-gradient);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  border: var(--glass-border);
+  box-shadow: var(--figma-drop-shadow), inset 1px 1px 2px rgba(255, 255, 255, 0.9);
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.glass-card::-webkit-scrollbar {
+  display: none;
+}
+
+/* 【階層 2】區塊次標題 (如：進行中 / 歷史紀錄)：統一為 16px */
+.section-title {
+  font-size: 16px;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--text-main);
+  margin: 10px 0 8px 4px;
+}
+
+/* ==========================================
+   4. 表單、輸入框與品項玻璃卡片 (統一正文字級)
+   ========================================== */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+/* 【階層 3】表單 Label：統一為 15px */
+.form-group label {
+  font-size: 15px;
+  font-style: italic;
+  color: var(--text-main);
+  font-weight: 500;
+}
+
+.forgot-password-link {
+  align-self: flex-end;
+  border: 0;
+  background: transparent;
+  color: #245b68;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.forgot-password-title {
+  margin-top: 0;
+  margin-right: 24px;
+}
+
+.forgot-password-copy {
+  margin-bottom: 18px;
+  color: var(--text-placeholder);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.forgot-password-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.forgot-password-form label {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.forgot-password-status {
+  margin-top: 14px;
+  color: #245b35;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* 【階層 3】輸入框與多行輸入：統一為 15px */
+.input-control {
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: var(--radius-input);
+  border: var(--glass-border);
+  background-color: var(--input-glass-bg);
+  background-image: var(--glass-light-gradient);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: var(--input-glass-shadow);
+  outline: none;
+  font-size: 15px;
+  color: var(--text-main);
+  transition: all 0.25s ease;
+}
+
+.input-control:focus {
+  background-color: rgba(255, 255, 255, 0.35);
+  border-color: #ffffff;
+  box-shadow: inset 1.5px 1.5px 3px rgba(255, 255, 255, 1), 0 0 12px rgba(255, 255, 255, 0.8), 2px 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+/* 【階層 6】Placeholder 預設提示字：統一為 13px */
+.input-control::placeholder,
+.textarea-control::placeholder {
+  color: var(--text-placeholder);
+  font-size: 13px;
+}
+
+/* 【階層 3】列表品項獨立玻璃外框：內文 15px */
+.list-item {
+  width: 100%;
+  padding: 10px 16px;
+  margin-bottom: 8px;
+  border-radius: var(--radius-item);
+  background-color: var(--input-glass-bg);
+  background-image: var(--glass-light-gradient);
+  border: var(--glass-border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: var(--input-glass-shadow);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.15s ease, background-color 0.2s ease;
+}
+
+.list-item:active {
+  transform: scale(0.98);
+  background-color: rgba(255, 255, 255, 0.35);
+}
+
+.list-item .item-title {
+  font-size: 15px;
+  font-style: italic;
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+/* 【階層 5】金額數字：統一為 15px 粗體 */
+.list-item .price.green {
+  font-size: 15px;
+  font-style: italic;
+  font-weight: bold;
+  color: var(--price-green);
+}
+
+/* ==========================================
+   5. 按鈕與底部導覽列 (統一按鈕字級)
+   ========================================== */
+.btn-group {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  margin-top: auto;
+}
+
+/* 【階層 4】主要按鈕：統一為 15px 斜粗體 */
+.btn-primary {
+  flex: 1;
+  padding: 10px 0;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: var(--radius-btn);
+  background: var(--btn-bg);
+  color: var(--text-main);
+  font-size: 15px;
+  font-style: italic;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--figma-drop-shadow), inset 1px 1px 2px rgba(255, 255, 255, 1);
+  text-align: center;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+/* 分頁小按鈕字級微調 */
+.pagination-group .btn-primary {
+  font-size: 13px;
+  padding: 7px 0;
+}
+
+/* 底部導覽列 */
+.bottom-nav {
+  width: 100%;
+  height: 52px;
+  background: var(--nav-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+  box-shadow: var(--figma-drop-shadow);
+  flex-shrink: 0;
+}
+
+.nav-item {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: var(--text-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+}
+
+.nav-item.lang-btn {
+  font-size: 12px;
+  font-weight: bold;
+  background: var(--toggle-bg);
+  flex: 0 0 48px;
+  width: 48px;
+  height: 38px;
+  padding: 0;
+  border-radius: 12px;
+}
+
+.nav-item.theme-btn {
+  background: var(--toggle-bg);
+  flex: 0 0 48px;
+  width: 48px;
+  height: 38px;
+  border-radius: 12px;
+}
+
+[lang="en"] .lang-zh,
+[lang="zh-TW"] .lang-en {
+  display: none !important;
+}
+
+/* ==========================================
+   Flatpickr 玻璃質感彈窗樣式覆蓋
+   ========================================== */
+.flatpickr-calendar {
+  background: rgba(215, 235, 237, 0.82) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.85) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+  font-family: inherit !important;
+  color: #000000 !important;
+}
+
+.flatpickr-calendar .flatpickr-months .flatpickr-month,
+.flatpickr-calendar .flatpickr-weekdays,
+span.flatpickr-weekday {
+  background: transparent !important;
+  color: #000000 !important;
+  font-weight: 600 !important;
+}
+
+.flatpickr-day {
+  color: #000000 !important;
+  border-radius: 12px !important;
+}
+
+.flatpickr-day.today {
+  border-color: rgba(0, 0, 0, 0.3) !important;
+}
+
+.flatpickr-day.selected, 
+.flatpickr-day.selected:hover {
+  background: rgba(56, 123, 40, 0.85) !important; /* 綠色高亮選取項 */
+  border-color: transparent !important;
+  color: #ffffff !important;
+}
+
+.flatpickr-day:hover {
+  background: rgba(255, 255, 255, 0.4) !important;
+}
+
+.flatpickr-time input, 
+.flatpickr-time .flatpickr-am-pm {
+  color: #000000 !important;
+  font-weight: bold !important;
+}
+
+.flatpickr-time input:hover, 
+.flatpickr-time .flatpickr-am-pm:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+
+.select-control {
+  width: 100%;
+  padding: 11px 40px 11px 16px; /* 右側保留空間給箭頭 */
+  border-radius: var(--radius-input);
+  border: var(--glass-border);
+  background-color: var(--input-glass-bg);
+  background-image: var(--glass-light-gradient);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: var(--input-glass-shadow);
+  outline: none;
+  font-size: 15px;
+  color: var(--text-main);
+  transition: all 0.25s ease;
+
+  /* 隱藏瀏覽器預設箭頭 */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  /* 自訂向下箭頭（對齊右側 16px 處） */
+  background-image: 
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23333333' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>"),
+    var(--glass-light-gradient);
+  background-repeat: no-repeat, repeat;
+  background-position: right 16px center, 0 0;
+  background-size: 12px 12px, auto;
+  cursor: pointer;
+}
+
+/* ==========================================
+   6. 菜單建立與維護專屬樣式 (Menu Builder)
+   ========================================== */
+
+/* 多行輸入框樣式 */
+.textarea-control {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+}
+
+/* 頁籤按鈕與 Active 高亮 */
+.tab-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 8px 4px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.65);
+  color: var(--text-main);
+  font-size: 13px;
+  font-style: italic;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--figma-drop-shadow);
+  transition: all 0.25s ease;
+  text-align: center;
+}
+
+.tab-btn.active {
+  background: #4a6c1b;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.menu-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.count-badge {
+  font-size: 12px;
+  font-style: italic;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 4px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  color: var(--text-main);
+}
+
+.menu-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.price-edit-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.edit-icon-btn {
+  background: transparent;
+  border: none;
+  color: #4a5d5e;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 4px;
+  transition: transform 0.15s ease;
+}
+
+.edit-icon-btn:active {
+  transform: scale(0.9);
+}
+
+/* 玻璃質感 Modal 彈窗樣式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 350px;
+  background-color: var(--card-glass-bg);
+  background-image: var(--glass-light-gradient);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-card);
+  padding: 22px;
+  border: var(--glass-border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  position: relative;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+.btn-danger {
+  background: rgba(210, 65, 65, 0.82);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+/* 修正面板內操作按鈕 (解析/辨識、新增品項、上傳照片等) */
+.mode-panel .btn-primary {
+  flex: none;
+  width: auto;
+  min-width: 120px;
+  padding: 8px 20px;
+  margin: 8px 0 16px 0;
+  display: inline-block;
+  border-radius: var(--radius-btn);
+}
+
+/* 上傳/拍照區塊按鈕排列 */
+.scan-upload-group .btn-primary {
+  flex: 1;
+  margin: 0;
+}
+
+/* ==========================================
+   7. 訂單看板專屬樣式 (Order Dashboard)
+   ========================================== */
+
+/* 頂部三欄數據統計區塊 */
+.dashboard-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  border-radius: var(--radius-item);
+  background-color: rgba(255, 255, 255, 0.25);
+  border: var(--glass-border);
+  box-shadow: var(--input-glass-shadow);
+}
+
+.summary-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.summary-label {
+  font-size: 11px;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--text-placeholder);
+  letter-spacing: 0.3px;
+  margin-bottom: 2px;
+}
+
+.summary-value {
+  font-size: 15px;
+  font-style: italic;
+  font-weight: bold;
+  color: var(--text-main);
+}
+
+.summary-value.green {
+  color: var(--price-green);
+}
+
+.summary-value.status-dot {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-dot .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot .dot.green {
+  background-color: #2e7d32;
+}
+
+/* 訂單列表膠囊卡片 */
+.dashboard-orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+}
+
+.board-item-card {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: var(--radius-item);
+  background-color: var(--input-glass-bg);
+  background-image: var(--glass-light-gradient);
+  border: var(--glass-border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: var(--input-glass-shadow);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.board-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.board-item-name {
+  font-size: 16px;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.board-item-details {
+  font-size: 12px;
+  color: var(--text-placeholder);
+}
+
+.board-item-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.board-item-price {
+  font-size: 16px;
+  font-style: italic;
+  font-weight: bold;
+  color: var(--price-green);
+}
+
+/* 狀態標籤（已確認 / 待確認） */
+.status-badge {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+.status-badge.confirmed {
+  background-color: rgba(160, 210, 150, 0.55);
+  color: #1e5214;
+  border: 1px solid rgba(120, 180, 110, 0.6);
+}
+
+.status-badge.pending {
+  background-color: rgba(240, 180, 180, 0.55);
+  color: #9c2b2b;
+  border: 1px solid rgba(220, 140, 140, 0.6);
+}
+
+/* ==========================================
+   8. 點餐頁面數量加減控制器樣式 (Order Counter)
+   ========================================== */
+.quantity-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  padding: 3px 8px;
+  border-radius: 16px;
+  border: var(--glass-border);
+}
+
+.qty-btn {
+  background: rgba(255, 255, 255, 0.7);
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--text-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 1px 1px 2px rgba(0,0,0,0.15);
+  transition: transform 0.1s ease;
+}
+
+.qty-btn:active {
+  transform: scale(0.9);
+}
+
+.qty-val {
+  font-size: 14px;
+  font-weight: bold;
+  min-width: 18px;
+  text-align: center;
+}
+
+/* ==========================================
+   9. 發票明細與比對專屬樣式 (Invoice Match)
+   ========================================== */
+.invoice-tab-group {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 260px;
+  margin: 0 auto 16px auto;
+  flex-shrink: 0;
+}
+
+.invoice-tab-btn {
+  flex: 1;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.85);
+  color: #333333;
+  font-size: 13px;
+  font-style: italic;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--figma-drop-shadow);
+  transition: all 0.25s ease;
+  text-align: center;
+}
+
+.invoice-tab-btn.active {
+  background: #4a6c1b;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* 覆蓋全域 flex: 1 避免按鈕高度拉撐變形 */
+.btn-primary.invoice-confirm-btn {
+  flex: none;
+  width: 100%;
+  padding: 12px 0;
+  margin-top: 10px;
+  border-radius: var(--radius-btn);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ==========================================
+   9. Q 版 QR Code 與加入點餐團樣式 (Join Group)
+   ========================================== */
+.qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.qr-box {
+  width: 170px;
+  height: 170px;
+  background: #ffffff;
+  border-radius: 32px;
+  padding: 14px;
+  border: 3px solid #ffde9c;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), inset 0 0 10px rgba(255, 230, 180, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+
+.qr-box:active {
+  transform: scale(0.93) rotate(-2deg);
+}
+
+.qr-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 16px;
+}
+
+.qr-hint {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  margin-top: 10px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.divider-text {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-placeholder);
+  margin: 6px 0 12px 0;
+  font-style: italic;
+}
+
+/* ==========================================
+   10. Q 版假向量 QR Code (整合至 CSS 背景)
+   ========================================== */
+.dummy-qr-bg {
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+  background-color: #ffffff;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='8' y='8' width='24' height='24' rx='7' fill='%232c3e50'/><rect x='13' y='13' width='14' height='14' rx='4' fill='%23ffffff'/><rect x='16' y='16' width='8' height='8' rx='2.5' fill='%234a6c1b'/><rect x='68' y='8' width='24' height='24' rx='7' fill='%232c3e50'/><rect x='73' y='13' width='14' height='14' rx='4' fill='%23ffffff'/><rect x='76' y='16' width='8' height='8' rx='2.5' fill='%234a6c1b'/><rect x='8' y='68' width='24' height='24' rx='7' fill='%232c3e50'/><rect x='13' y='73' width='14' height='14' rx='4' fill='%23ffffff'/><rect x='16' y='76' width='8' height='8' rx='2.5' fill='%234a6c1b'/><circle cx='42' cy='16' r='3.5' fill='%23333333'/><circle cx='54' cy='16' r='3.5' fill='%23e67e22'/><circle cx='42' cy='28' r='3.5' fill='%23333333'/><circle cx='54' cy='28' r='3.5' fill='%23333333'/><rect x='12' y='42' width='7' height='7' rx='2' fill='%23333333'/><rect x='24' y='42' width='7' height='7' rx='2' fill='%23333333'/><circle cx='42' cy='45' r='4' fill='%234a6c1b'/><circle cx='56' cy='45' r='3' fill='%23333333'/><rect x='68' y='42' width='8' height='8' rx='2.5' fill='%23e74c3c'/><circle cx='84' cy='46' r='3.5' fill='%23333333'/><circle cx='40' cy='62' r='3' fill='%23333333'/><rect x='50' y='58' width='8' height='8' rx='2' fill='%23333333'/><circle cx='68' cy='62' r='3.5' fill='%23333333'/><rect x='78' y='58' width='10' height='10' rx='3' fill='%234a6c1b'/><circle cx='42' cy='80' r='3.5' fill='%23e67e22'/><rect x='52' y='76' width='8' height='8' rx='2.5' fill='%23333333'/><circle cx='68' cy='80' r='3.5' fill='%23333333'/><circle cx='82' cy='80' r='3.5' fill='%23333333'/><rect x='20' y='44' width='60' height='16' rx='8' fill='%23ff7675' opacity='0.92'/><text x='50' y='55' font-size='8.5' font-weight='bold' fill='%23ffffff' text-anchor='middle' font-family='sans-serif'>SAMPLE QR</text></svg>");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* ==========================================
+   11. 訂單草稿專屬樣式 (Draft Order)
+   ========================================== */
+.edited-badge {
+  font-size: 10px;
+  font-weight: bold;
+  color: #7f8c8d;
+  background: rgba(0, 0, 0, 0.08);
+  padding: 3px 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  letter-spacing: 0.5px;
+}
+
+.item-check-square {
+  width: 14px;
+  height: 14px;
+  background-color: #a8c3a0;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.warning-text {
+  color: #d32f2f;
+  font-size: 11px;
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-weight: 500;
+}
+
+/* ==========================================
+   12. 我的訂單專屬樣式 (My Orders)
+   ========================================== */
+.status-badge.closed {
+  background-color: rgba(180, 190, 195, 0.55);
+  color: #4a5a60;
+  border: 1px solid rgba(150, 165, 170, 0.6);
+}
+
+/* ==========================================
+   13. 我要付多少專屬樣式 (My Payment)
+   ========================================== */
+.payment-hero-card {
+  width: 100%;
+  background-color: var(--card-glass-bg);
+  background-image: var(--glass-light-gradient);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-card);
+  padding: 14px;
+  border: var(--glass-border);
+  box-shadow: var(--figma-drop-shadow), inset 1px 1px 2px rgba(255, 255, 255, 0.9);
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.hero-label {
+  font-size: 11px;
+  color: var(--text-placeholder);
+  font-style: italic;
+  font-weight: 500;
+}
+
+.hero-amount {
+  font-size: 32px;
+  font-weight: bold;
+  font-style: italic;
+  color: var(--text-main);
+  margin: 2px 0;
+}
+
+.hero-subtext {
+  font-size: 11px;
+  color: var(--text-placeholder);
+}
+
+.payment-info-box {
+  width: 100%;
+  padding: 12px 16px;
+  flex-shrink: 0;
+  border-radius: var(--radius-item);
+  background: rgba(255, 255, 255, 0.35);
+  border: var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-main);
+}
+
+#btn-mark-paid {
+  flex-shrink: 0;
+  margin-top: 12px;
+}
+
+.payment-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.payment-info-row .label {
+  color: var(--text-placeholder);
+}
+
+.payment-info-row .value {
+  font-weight: bold;
+}
+
+/* ==========================================
+   響應式設計：電腦版大螢幕適配
+   ========================================== 
+@media screen and (min-width: 768px) {
+  .app-container {
+    max-width: 600px; 
+    height: 95vh; 
+    max-height: 900px;
+    margin: auto;
+    overflow: hidden;
+  }
+  .glass-card {
+    padding: 30px;
+  }
+}*/
+
+/* ==========================================
+   響應式設計：電腦版大螢幕適配（模擬手機 App 框）
+   ========================================== */
+@media screen and (min-width: 768px) {
+  .app-container {
+    width: 100% !important;
+    max-width: 500px !important;
+    height: 90vh !important;
+    max-height: 844px !important;
+    margin: 30px auto !important;
+    border-radius: 36px !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
+    overflow: hidden !important;
+    position: relative;
+  }
+  .glass-card {
+    margin-bottom: 10px;
+  }
+}
