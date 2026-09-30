@@ -2,10 +2,10 @@
    1. 全局變數與 Figma 磨砂透光玻璃參數
    ========================================== */
 :root {
-  --bg-color: #83bdca;
+  --bg-color: #fffdf6; /* fffdf6  d5cfbf */
   
   /* 玻璃主卡片與輸入框透光背景 */
-  --card-glass-bg: rgba(220, 237, 238, 0.28); 
+  --card-glass-bg: rgba(204, 217, 218, 0.201); 
   --input-glass-bg: rgba(255, 255, 255, 0.18);
 
   /* -45° 折射高光漸層 */
@@ -20,6 +20,7 @@
   /* 高光邊框與磨砂模糊 */
   --glass-border: 1px solid rgba(255, 255, 255, 0.75);
   --glass-blur: blur(14px);
+  --glass-blur00: blur(4px);
 
   /* Figma Drop Shadow + Inset 內陰影 */
   --figma-drop-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
@@ -80,7 +81,7 @@ html[data-theme="dark"] .input-control:focus {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Georgia", "Segoe UI", serif;
+  font-family: "Instrument Serif", serif !important;
   -webkit-tap-highlight-color: transparent;
 }
 /*
@@ -197,7 +198,7 @@ body {
 
 /* 【階層 2】區塊次標題 (如：進行中 / 歷史紀錄)：統一為 16px */
 .section-title {
-  font-size: 16px;
+  font-size: 18px !important;
   font-style: italic;
   font-weight: 600;
   color: var(--text-main);
@@ -214,9 +215,9 @@ body {
   margin-bottom: 32px;
 }
 
-/* 【階層 3】表單 Label：統一為 15px */
+/* 【階層 3】表單 Label：統一為 18px */
 .form-group label {
-  font-size: 15px;
+  font-size: 18px;
   font-style: italic;
   color: var(--text-main);
   font-weight: 500;
@@ -274,7 +275,7 @@ body {
   -webkit-backdrop-filter: blur(10px);
   box-shadow: var(--input-glass-shadow);
   outline: none;
-  font-size: 15px;
+  font-size: 16px;
   color: var(--text-main);
   transition: all 0.25s ease;
 }
@@ -619,6 +620,169 @@ span.flatpickr-weekday {
   border: var(--glass-border);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
   position: relative;
+}
+
+.calendar-modal {
+  max-width: 360px;
+  color: var(--text-main);
+}
+
+.deadline-trigger {
+  display: block;
+  text-align: left;
+  cursor: pointer;
+}
+
+.calendar-header {
+  display: grid;
+  grid-template-columns: 38px 1fr 38px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.calendar-month {
+  color: var(--text-main);
+  text-align: center;
+  font-weight: 600;
+}
+
+.calendar-nav {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--toggle-bg);
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  text-align: center;
+}
+
+.calendar-weekdays {
+  margin-bottom: 6px;
+  color: var(--text-placeholder);
+  font-size: 13px;
+}
+
+.calendar-day,
+.calendar-empty {
+  aspect-ratio: 1;
+}
+
+.calendar-day {
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+.calendar-day:hover,
+.calendar-day.is-selected {
+  border-color: var(--glass-border);
+  background: var(--btn-bg);
+  box-shadow: var(--figma-drop-shadow);
+}
+
+.calendar-time-label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 16px 0;
+  color: var(--text-main);
+}
+
+.calendar-done {
+  width: 100%;
+}
+
+.calendar-time-picker {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.calendar-time-unit {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--text-main);
+  text-align: center;
+}
+
+.time-stepper {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  align-items: center;
+  gap: 6px;
+}
+
+.time-stepper button,
+.time-stepper output {
+  min-width: 0;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: var(--glass-border);
+  border-radius: var(--radius-input);
+  background: var(--input-glass-bg);
+  color: var(--text-main);
+  box-shadow: var(--input-glass-shadow);
+}
+
+.time-stepper button {
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.time-stepper output {
+  font-size: 16px;
+}
+
+.join-qr-trigger {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 0 auto;
+  padding: 16px;
+  border: var(--glass-border);
+  border-radius: var(--radius-card);
+  background: var(--card-glass-bg);
+  color: var(--text-main);
+  box-shadow: var(--figma-drop-shadow);
+  cursor: pointer;
+}
+
+.join-qr-paper {
+  display: grid;
+  place-items: center;
+  padding: 10px;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.join-qr-empty {
+  color: var(--text-placeholder);
+  text-align: center;
+}
+
+.join-scanner-modal {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.join-scanner-modal .btn-primary {
+  width: 100%;
+  margin-top: 12px;
 }
 
 .modal-close-btn {
@@ -1064,7 +1228,8 @@ span.flatpickr-weekday {
   font-weight: bold;
 }
 
-/* ==========================================
+/* 
+==========================================
    響應式設計：電腦版大螢幕適配
    ========================================== 
 @media screen and (min-width: 768px) {
@@ -1078,7 +1243,8 @@ span.flatpickr-weekday {
   .glass-card {
     padding: 30px;
   }
-}*/
+}
+*/
 
 /* ==========================================
    響應式設計：電腦版大螢幕適配（模擬手機 App 框）
@@ -1091,9 +1257,14 @@ span.flatpickr-weekday {
     max-height: 844px !important;
     margin: 30px auto !important;
     border-radius: 36px !important;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
     overflow: hidden !important;
     position: relative;
+
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
+    /* 模擬手機 App 框磨砂效果 */
+    background-color: var(--card-glass-bg);
+    background-image: var(--glass-light-gradient);
+    backdrop-filter: var(--glass-blur00);
   }
   .glass-card {
     margin-bottom: 10px;

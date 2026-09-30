@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import type { Language, InvoiceItem } from '../types';
 import { BottomNav } from '../components/BottomNav';
-import { Delete, Add, Warning } from '@mui/icons-material';
+/*import { Delete, Add, Warning } from '@mui/icons-material';*/
+import { validateRequiredFields } from '../utils/validation';
+/*const [manQty, setManQty] = useState('');*/
 
 interface InvoiceMatchProps {
   currentLang: Language;
@@ -28,7 +30,7 @@ export const InvoiceMatch: React.FC<InvoiceMatchProps> = ({
 
   // Manual inputs
   const [manName, setManName] = useState('');
-  const [manQty, setManQty] = useState('1');
+  const [manQty, setManQty] = useState('');
   const [manPrice, setManPrice] = useState('');
 
   const invoiceTotal = items.reduce((sum, item) => sum + item.totalPrice, 0);
@@ -49,6 +51,23 @@ export const InvoiceMatch: React.FC<InvoiceMatchProps> = ({
   const handleDelete = (index: number) => {
     setItems(items.filter((_, i) => i !== index));
   };
+
+  if (!validateRequiredFields(
+    [
+      { value: manName, label: isZh ? '品項名稱' : 'Item name' },
+      { value: manQty, label: isZh ? '數量' : 'Quantity' },
+      { value: manPrice, label: isZh ? '單價' : 'Price' },
+    ],
+    isZh,
+  )) return;
+  
+  const qtyNum = Number(manQty);
+  const priceNum = Number(manPrice);
+  
+  if (!Number.isInteger(qtyNum) || qtyNum <= 0 || !Number.isFinite(priceNum) || priceNum <= 0) {
+    alert(isZh ? '數量和單價都必須大於 0。' : 'Quantity and price must be greater than 0.');
+    return;
+  }
 
   return (
     <Box className="app-container" sx={{ width: '100%', maxWidth: 414, height: '100vh', p: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', mx: 'auto' }}>

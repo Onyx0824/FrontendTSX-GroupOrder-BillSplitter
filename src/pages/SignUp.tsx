@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import type { Language } from '../types';
 import { BottomNav } from '../components/BottomNav';
+import {
+  isStrongPassword,
+  validateRequiredFields,
+} from '../utils/validation';
 
 interface SignUpProps {
   currentLang: Language;
@@ -26,6 +30,44 @@ export const SignUp: React.FC<SignUpProps> = ({
 
   const isZh = currentLang === 'zh-TW';
 
+  const handleSignUpSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+  
+    if (!validateRequiredFields(
+      [
+        { value: nickname, label: isZh ? '暱稱' : 'Nickname' },
+        { value: phone, label: isZh ? '電話號碼' : 'Phone number' },
+        { value: email, label: isZh ? '電子郵件' : 'Email' },
+        { value: password, label: isZh ? '密碼' : 'Password' },
+        { value: confirmPassword, label: isZh ? '確認密碼' : 'Confirm password' },
+      ],
+      isZh,
+    )) {
+      return;
+    }
+  
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      alert(isZh ? '請輸入有效的電子郵件。' : 'Please enter a valid email address.');
+      return;
+    }
+  
+    if (!isStrongPassword(password)) {
+      alert(
+        isZh
+          ? '密碼至少 12 個字元，並包含英文大小寫、數字及符號。'
+          : 'Password must be at least 12 characters and include uppercase, lowercase, a number, and a symbol.',
+      );
+      return;
+    }
+  
+    if (password !== confirmPassword) {
+      alert(isZh ? '兩次輸入的密碼不一致。' : 'Passwords do not match.');
+      return;
+    }
+  
+    onNavigate('sign-in');
+  };
+
   return (
     <Box className="app-container" sx={{ width: '100%', maxWidth: 414, height: '100vh', p: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', mx: 'auto' }}>
       <div className="notch"></div>
@@ -37,7 +79,7 @@ export const SignUp: React.FC<SignUpProps> = ({
       </Box>
 
       <Box className="glass-card" sx={{ width: '100%', flex: 1, p: 3, borderRadius: '26px', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
-        <Box component="form" onSubmit={(e) => { e.preventDefault(); onNavigate('sign-in'); }} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <Box component="form" onSubmit={handleSignUpSubmit} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
           
           <div className="form-group">
             <label>{isZh ? '暱稱' : 'Nickname'}</label>

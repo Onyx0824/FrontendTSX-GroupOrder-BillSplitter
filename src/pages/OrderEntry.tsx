@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography } from '@mui/material'; /* , Button */
 import type { Language, MenuItem } from '../types';
 import { BottomNav } from '../components/BottomNav';
 

@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Box, Typography, Modal } from '@mui/material';
 import type { Language, MenuItem } from '../types';
 import { BottomNav } from '../components/BottomNav';
-import { Edit, Image, CameraAlt, Close } from '@mui/icons-material';
+import { Edit, Image, CameraAlt } from '@mui/icons-material';/* , Close */
+import { validateRequiredFields } from '../utils/validation';
 
 interface MenuBuilderProps {
   currentLang: Language;
@@ -36,11 +37,19 @@ export const MenuBuilder: React.FC<MenuBuilderProps> = ({
   const [modalPrice, setModalPrice] = useState('');
 
   const handleAddManual = () => {
-    const priceNum = parseInt(manualPrice, 10);
-    if (manualName.trim() && !isNaN(priceNum)) {
-      setMenuItems([...menuItems, { nameEn: manualName, nameZh: manualName, price: priceNum }]);
-      setManualName('');
-      setManualPrice('');
+    const priceNum = Number(manualPrice);
+    
+    if (!validateRequiredFields(
+      [
+        { value: manualName, label: isZh ? '品項名稱' : 'Item name' },
+        { value: manualPrice, label: isZh ? '單價' : 'Price' },
+      ],
+      isZh,
+    )) return;
+    
+    if (!Number.isFinite(priceNum) || priceNum <= 0) {
+      alert(isZh ? '單價必須大於 0。' : 'Price must be greater than 0.');
+      return;
     }
   };
 

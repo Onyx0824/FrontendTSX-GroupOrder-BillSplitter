@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import type { Language, ThemeMode } from './types';
 import { initialMockData } from './data/mockData';
 
@@ -19,6 +19,31 @@ import { MyOrderingGroup } from './pages/MyOrderingGroup';
 import { MyOrders } from './pages/MyOrders';
 import { MyPayment } from './pages/MyPayment';
 
+const APP_PAGES = [
+  'sign-in',
+  'sign-up',
+  'create-group',
+  'join-group',
+  'menu-builder',
+  'order-entry',
+  'order-draft',
+  'order-board',
+  'store-summary',
+  'invoice-match',
+  'split-settings',
+  'payment-tracking',
+  'my-group',
+  'my-orders',
+  'my-payment',
+] as const;
+
+type AppPage = (typeof APP_PAGES)[number];
+
+const getPageFromUrl = (): AppPage => {
+  const page = new URLSearchParams(window.location.search).get('page');
+  return APP_PAGES.includes(page as AppPage) ? (page as AppPage) : 'sign-in';
+};
+
 export default function App() {
   const [currentLang, setCurrentLang] = useState<Language>(() => {
     return (localStorage.getItem('user_lang') as Language) || 'en';
@@ -28,7 +53,26 @@ export default function App() {
     return (localStorage.getItem('user_theme') as ThemeMode) || 'light';
   });
 
-  const [currentPage, setCurrentPage] = useState<string>('sign-in');
+  const [currentPage, setCurrentPage] = useState<AppPage>(getPageFromUrl);
+  
+  const navigate = (page: string) => {
+    if (!APP_PAGES.includes(page as AppPage)) return;
+
+    const nextPage = page as AppPage;
+    const url = new URL(window.location.href);
+    url.searchParams.set('page', nextPage);
+
+    window.history.pushState({}, '', url);
+    setCurrentPage(nextPage);
+  };
+
+  useEffect(() => {
+    const handlePopState = () => setCurrentPage(getPageFromUrl());
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const [appData, setAppData] = useState(initialMockData);
 
   // 同步 HTML 屬性
@@ -57,7 +101,7 @@ export default function App() {
       currentTheme,
       onToggleLang: toggleLang,
       onToggleTheme: toggleTheme,
-      onNavigate: setCurrentPage,
+      onNavigate: navigate,
       data: appData,
       setData: setAppData,
     };

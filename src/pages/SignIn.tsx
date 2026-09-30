@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, Typography, Modal } from '@mui/material';
 import type { Language } from '../types';
 import { BottomNav } from '../components/BottomNav';
+import { validateRequiredFields } from '../utils/validation';
 
 interface SignInProps {
   currentLang: Language;
@@ -26,6 +27,22 @@ export const SignIn: React.FC<SignInProps> = ({
 
   const isZh = currentLang === 'zh-TW';
 
+  const handleSignInSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateRequiredFields(
+      [
+        { value: email, label: isZh ? '電子郵件' : 'Email' },
+        { value: password, label: isZh ? '密碼' : 'Password' },
+      ],
+      isZh,
+    )) {
+      return;
+    }
+
+    onNavigate('order-entry');
+  };
+
   const handleForgotSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setStatusMsg(
@@ -48,7 +65,12 @@ export const SignIn: React.FC<SignInProps> = ({
 
       {/* 玻璃卡片 */}
       <Box className="glass-card" sx={{ width: '100%', flex: 1, p: 3, borderRadius: '26px', display: 'flex', flexDirection: 'column' }}>
-        <Box component="form" onSubmit={(e) => { e.preventDefault(); onNavigate('order-entry'); }} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <Box
+          component="form"
+          noValidate
+          onSubmit={handleSignInSubmit}
+          sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+        >
           
           <div className="form-group">
             <label htmlFor="email">{isZh ? '電子郵件' : 'Email'}</label>
@@ -81,6 +103,13 @@ export const SignIn: React.FC<SignInProps> = ({
             <button type="button" className="btn-primary" onClick={() => onNavigate('sign-up')}>
               {isZh ? '註冊' : 'Sign up'}
             </button>
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={() => onNavigate('join-group')}
+            >
+              {isZh ? '加入點餐團' : 'Join Group'}
+            </button>
             <button type="submit" className="btn-primary">
               {isZh ? '確認' : 'Confirm'}
             </button>
@@ -100,7 +129,7 @@ export const SignIn: React.FC<SignInProps> = ({
           <p className="forgot-password-copy" style={{ fontSize: '13px', marginBottom: '18px' }}>
             {isZh ? '請輸入註冊帳號使用的電子郵件。' : 'Enter the email address associated with your account.'}
           </p>
-          <form onSubmit={handleForgotSubmit} className="forgot-password-form">
+                    <form onSubmit={handleForgotSubmit} className="forgot-password-form">
             <label>{isZh ? '電子郵件' : 'Email'}</label>
             <input
               type="email"

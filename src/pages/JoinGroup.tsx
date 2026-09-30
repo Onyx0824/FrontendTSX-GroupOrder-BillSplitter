@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
-import { Box, Typography } from '@mui/material';
 import type { Language } from '../types';
 import { BottomNav } from '../components/BottomNav';
-import { CameraAlt } from '@mui/icons-material';
+import React, { useEffect, useState } from 'react';
+import {
+  Html5QrcodeScanType,
+  Html5QrcodeScanner,
+} from 'html5-qrcode';
+import { QRCodeSVG } from 'qrcode.react';
+import { Box, Typography, Modal } from '@mui/material';
 
 interface JoinGroupProps {
   currentLang: Language;
@@ -19,25 +23,90 @@ export const JoinGroup: React.FC<JoinGroupProps> = ({
   onToggleTheme,
   onNavigate,
 }) => {
-  const [inviteLink, setInviteLink] = useState('');
   const [displayName, setDisplayName] = useState('');
   const isZh = currentLang === 'zh-TW';
+  const [scannerOpen, setScannerOpen] = useState(false);
 
-  const handleScanQr = () => {
-    setInviteLink('https://order.example.com/join?group=888');
-    alert(isZh ? '相機掃描成功！已自動帶入點餐團邀請連結。' : 'Camera QR Code scanned successfully!');
+  const getInviteGroupId = (value: string) => {
+    try {
+      const url = new URL(value.trim());
+      if (url.origin !== window.location.origin) return null;
+      return url.searchParams.get('group');
+    } catch {
+      return null;
+    }
   };
+  
+  useEffect(() => {
+    if (!scannerOpen) return;
+
+    let scanner: Html5QrcodeScanner | undefined;
+
+    const timer = window.setTimeout(() => {
+      scanner = new Html5QrcodeScanner(
+        'join-qr-reader',
+        {
+          fps: 10,
+          qrbox: { width: 220, height: 220 },
+          supportedScanTypes: [
+            Html5QrcodeScanType.SCAN_TYPE_CAMERA,
+            Html5QrcodeScanType.SCAN_TYPE_FILE,
+          ],
+        },
+        false,
+      );
+
+      scanner.render(
+        (decodedText) => {
+          if (!getInviteGroupId(decodedText)) {
+            alert(isZh ? '這不是有效的點餐團邀請連結。' : 'Invalid group invite link.');
+            return;
+          }
+
+          setInviteLink(decodedText);
+          setScannerOpen(false);
+        },
+        (error) => console.error('QR scanner error:', error),
+      );
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timer);
+      if (scanner) {
+        void scanner.clear().catch((error) =>
+          console.error('QR scanner cleanup error:', error),
+        );
+      }
+    };
+  }, [scannerOpen, isZh]);
 
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!displayName.trim()) {
       alert(isZh ? '請輸入顯示名稱以加入點餐團！' : 'Please enter your display name!');
       return;
     }
+
+    const joinedGroupId = getInviteGroupId(inviteLink);
+    
+    if (!joinedGroupId) {
+      alert(isZh ? '請輸入有效的點餐團邀請連結。' : 'Please enter a valid group invite link.');
+      return;
+    }
+
     localStorage.setItem('user_display_name', displayName);
-    alert(isZh ? `歡迎 ${displayName}！已成功加入點餐團。` : `Welcome ${displayName}! Joined group successfully.`);
+    localStorage.setItem('active_group_id', joinedGroupId);
     onNavigate('order-entry');
   };
+
+  const [groupId] = useState(
+    () => new URLSearchParams(window.location.search).get('group'),
+  );
+
+  const [inviteLink, setInviteLink] = useState(() =>
+    groupId ? window.location.href : '',
+  );
 
   return (
     <Box className="app-container" sx={{ width: '100%', maxWidth: 414, height: '100vh', p: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', mx: 'auto' }}>
@@ -51,15 +120,24 @@ export const JoinGroup: React.FC<JoinGroupProps> = ({
 
       <Box className="glass-card" sx={{ width: '100%', flex: 1, p: 3, borderRadius: '26px', display: 'flex', flexDirection: 'column' }}>
         <Box component="form" onSubmit={handleJoin} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-
-          <div className="qr-container" onClick={handleScanQr} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '12px', cursor: 'pointer' }}>
-            <div className="qr-box" style={{ width: '170px', height: '170px', background: '#ffffff', borderRadius: '32px', padding: '14px', border: '3px solid #ffde9c', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <div className="dummy-qr-bg"></div>
-            </div>
-            <div className="qr-hint" style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.95)', fontWeight: 'bold', marginTop: '10px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <CameraAlt sx={{ fontSize: 14 }} />
-              <span>TAP TO SCAN QR CODE</span>
-            </div>
+          <div className="qr-container">
+            {inviteLink ? (
+              <button
+                type="button"
+                className="join-qr-trigger"
+                onClick={() => setScannerOpen(true)}
+                aria-label={isZh ? '點擊以掃描 QR Code' : 'Tap to scan a QR code'}
+              >
+                <span className="join-qr-paper">
+                  <QRCodeSVG value={inviteLink} size={142} level="M" />
+                </span>
+                <span>{isZh ? '點擊 QR Code 開啟相機或相簿' : 'Tap QR code to open camera or photos'}</span>
+              </button>
+            ) : (
+              <p className="join-qr-empty">
+                {isZh ? '請貼上邀請連結以顯示 QR Code' : 'Paste an invite link to show its QR code'}
+              </p>
+            )}
           </div>
 
           <div className="divider-text" style={{ textAlign: 'center', fontSize: '12px', color: 'var(--text-placeholder)', margin: '6px 0 12px 0', fontStyle: 'italic' }}>
@@ -98,6 +176,26 @@ export const JoinGroup: React.FC<JoinGroupProps> = ({
 
         </Box>
       </Box>
+
+            <Modal
+              open={scannerOpen}
+              onClose={() => setScannerOpen(false)}
+              sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', p: 2 }}
+            >
+              <Box className="modal-card join-scanner-modal">
+                <Typography className="section-title">
+                  {isZh ? '掃描點餐團 QR Code' : 'Scan Group QR Code'}
+                </Typography>
+                <div id="join-qr-reader" />
+                <button
+                  type="button"
+                  className="btn-primary"
+                  onClick={() => setScannerOpen(false)}
+                >
+                  {isZh ? '取消' : 'Cancel'}
+                </button>
+              </Box>
+            </Modal>
 
       <BottomNav currentLang={currentLang} currentTheme={currentTheme} onToggleLang={onToggleLang} onToggleTheme={onToggleTheme} onNavigate={onNavigate} />
     </Box>
